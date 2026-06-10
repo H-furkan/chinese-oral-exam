@@ -54,6 +54,7 @@ function seg(zh) {
 document.addEventListener("click", (e) => {
   const w = e.target.closest(".w");
   if (!w || w.classList.contains("plain") || w.closest(".veiled")) return;
+  if (w.closest(".quiz-opts")) return; // clicking an option answers the quiz, don't open the word bar
   const entry = DATA.glossary[w.dataset.w];
   if (!entry) return;
   $$(".w.sel").forEach(x => x.classList.remove("sel"));
@@ -81,9 +82,9 @@ $$(".part-card").forEach(c => c.addEventListener("click", () => showTab(c.datase
 (function countdown() {
   const days = Math.ceil((new Date(DATA.examDate) - new Date()) / 86400000);
   $("#countdown").textContent =
-    days > 1 ? `${days} days until the exam (June 16) 加油!` :
-    days === 1 ? "Exam is TOMORROW! 加油!" :
-    days === 0 ? "Exam is TODAY! 你可以的!" : "Exam date has passed — hope it went well!";
+    days > 1 ? `${days} days until the exam (June 16) 加油 jiāyóu!` :
+    days === 1 ? "Exam is TOMORROW! 加油 jiāyóu!" :
+    days === 0 ? "Exam is TODAY! 你可以的 nǐ kěyǐ de!" : "Exam date has passed — hope it went well!";
 })();
 
 /* ============ PART 1: flashcards ============ */
@@ -238,7 +239,7 @@ $("#p3-next").addEventListener("click", () => {
 
 function buildQwTable() {
   $("#qw-table tbody").innerHTML = DATA.questionWords.map(q =>
-    `<tr><td>${q.qw}</td><td>${q.py}</td><td>${q.use}</td><td class="zh-ex hide-py">${seg(q.ex)}</td></tr>`
+    `<tr><td>${q.qw}</td><td>${q.py}</td><td>${q.use}</td><td class="zh-ex">${seg(q.ex)}</td></tr>`
   ).join("");
 }
 
@@ -247,7 +248,7 @@ const monoState = { idx: 0 };
 
 function buildMonoTabs() {
   $("#mono-tabs").innerHTML = DATA.monologues.map((m, i) =>
-    `<button class="btn ghost mono-tab" data-i="${i}">${m.titleZh} · ${m.title}</button>`
+    `<button class="btn ghost mono-tab" data-i="${i}">${m.titleZh} ${m.titlePy} · ${m.title}</button>`
   ).join("");
   $$(".mono-tab").forEach(b => b.addEventListener("click", () => {
     monoState.idx = +b.dataset.i;
@@ -330,8 +331,8 @@ function makeQuiz() {
     qs.push({
       prompt: `How do you say “${v.en}” in Chinese?`,
       zh: null,
-      options: shuffle([v, ...wrong]).map(o => ({ label: `${o.zh}（${o.py}）`, ok: o.zh === v.zh })),
-      explain: `${v.zh} (${v.py}) = ${v.en}`,
+      options: shuffle([v, ...wrong]).map(o => ({ label: seg(o.zh), ok: o.zh === v.zh })),
+      explain: `${seg(v.zh)} = ${v.en}`,
     });
   });
   // type 2: pick the right answer to a question (from dialogues)
@@ -343,8 +344,8 @@ function makeQuiz() {
     qs.push({
       prompt: "Choose the best reply:",
       zh: d.q.zh,
-      options: shuffle([d, ...wrong]).map(o => ({ label: o.a.zh, ok: o.a.zh === d.a.zh })),
-      explain: `${d.q.zh} (${d.q.en}) → ${d.a.zh} (${d.a.en})`,
+      options: shuffle([d, ...wrong]).map(o => ({ label: seg(o.a.zh), ok: o.a.zh === d.a.zh })),
+      explain: `${seg(d.q.zh)} (${d.q.en}) → ${seg(d.a.zh)} (${d.a.en})`,
     });
   });
   // type 3: pick the right question for an answer (Part 3 style)
@@ -353,8 +354,8 @@ function makeQuiz() {
     qs.push({
       prompt: "Which question produces this answer? (Part 3!)",
       zh: p.s.zh,
-      options: shuffle([p, ...wrong]).map(o => ({ label: o.q[0].zh, ok: o.q[0].zh === p.q[0].zh })),
-      explain: `${p.s.zh} ← ${p.q[0].zh} (${p.q[0].en})`,
+      options: shuffle([p, ...wrong]).map(o => ({ label: seg(o.q[0].zh), ok: o.q[0].zh === p.q[0].zh })),
+      explain: `${seg(p.s.zh)} ← ${seg(p.q[0].zh)} (${p.q[0].en})`,
     });
   });
   return shuffle(qs).slice(0, QUIZ_LEN);
@@ -389,7 +390,7 @@ function renderQuizQ() {
       b.classList.add("wrong");
       $$(".quiz-opts button").forEach((bb, i) => { if (q.options[i].ok) bb.classList.add("correct"); });
     }
-    $("#quiz-explain").textContent = "📖 " + q.explain;
+    $("#quiz-explain").innerHTML = "📖 " + q.explain;
     $("#quiz-explain").classList.remove("hidden");
     $("#quiz-next").classList.remove("hidden");
   }));
@@ -401,9 +402,9 @@ function renderQuizDone() {
   const best = Math.max(store.get("bestScore", 0), s);
   store.set("bestScore", best);
   const msg =
-    s === n ? "🏆 满分！Perfect score! You're ready!" :
-    s >= n * 0.7 ? "👍 很好！Great job — review the ones you missed." :
-    "💪 加油！Keep practicing the dialogues and try again.";
+    s === n ? "🏆 满分 mǎnfēn! Perfect score! You're ready!" :
+    s >= n * 0.7 ? "👍 很好 hěn hǎo! Great job — review the ones you missed." :
+    "💪 加油 jiāyóu! Keep practicing the dialogues and try again.";
   $("#quiz-area").innerHTML = `
     <div class="quiz-score">
       <p>Your score: <strong>${s} / ${n}</strong> · Best: ${best} / ${n}</p>

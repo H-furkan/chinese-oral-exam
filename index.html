@@ -26,7 +26,7 @@
     <!-- ============ HOME ============ -->
     <section id="tab-home" class="tab active">
       <div class="card hero">
-        <h2>欢迎！Welcome to your exam trainer</h2>
+        <h2>欢迎 huānyíng! Welcome to your exam trainer</h2>
         <p>This site covers <strong>everything on the final oral exam</strong>, built from your course materials (sample paper, lessons 6–10 Q&amp;A, and the four speaking topics).</p>
         <div class="tip-box">
           <strong>👆 How it works:</strong> sentences are shown <strong>without English</strong> on purpose — that's how the exam feels. When a word blocks you, <strong>click it (the characters or the pinyin)</strong> and a bar pops up with its meaning. Full-sentence English stays available behind the "Show English" toggles if you really need it.
@@ -34,27 +34,27 @@
         <div class="exam-structure">
           <div class="part-card" data-goto="part1">
             <h3>Part 1 · 第一部分</h3>
-            <p class="zh-sample">根据英文意思说出中文</p>
+            <p class="zh-sample">根据英文意思说出中文<br><small>gēnjù Yīngwén yìsi shuōchū Zhōngwén</small></p>
             <p>Say the Chinese for an English word or sentence. <em>Practice with flashcards →</em></p>
           </div>
           <div class="part-card" data-goto="part2">
             <h3>Part 2 · 第二部分</h3>
-            <p class="zh-sample">听后回答</p>
+            <p class="zh-sample">听后回答<br><small>tīng hòu huídá</small></p>
             <p>The teacher reads a question once — you answer. <em>Practice the questions →</em></p>
           </div>
           <div class="part-card" data-goto="part3">
             <h3>Part 3 · 第三部分</h3>
-            <p class="zh-sample">根据答案提问</p>
+            <p class="zh-sample">根据答案提问<br><small>gēnjù dá'àn tíwèn</small></p>
             <p>You see an answer — you must ask the question. <em>Practice question words →</em></p>
           </div>
           <div class="part-card" data-goto="part4">
             <h3>Part 4 · 第四部分</h3>
-            <p class="zh-sample">介绍…… (周计划 / 朋友 / 钱包 / 房间)</p>
+            <p class="zh-sample">介绍…… (周计划 / 朋友 / 钱包 / 房间)<br><small>jièshào… (zhōu jìhuà / péngyou / qiánbāo / fángjiān)</small></p>
             <p>Give a short talk on one of the four topics. <em>Learn the model answers →</em></p>
           </div>
         </div>
         <div class="tip-box">
-          <strong>📅 Exam date:</strong> 中文考试是6月16号。(The Chinese exam is June 16th.)<br>
+          <strong>📅 Exam date:</strong> 中文考试是6月16号。Zhōngwén kǎoshì shì 6 yuè 16 hào. (The Chinese exam is June 16th.)<br>
           <strong>💡 Study plan:</strong> ① learn vocabulary → ② drill the 39 dialogues → ③ practice making questions → ④ memorize your four monologues → ⑤ test yourself with the quiz.
         </div>
         <div id="progress-summary"></div>
@@ -88,7 +88,7 @@
     <!-- ============ PART 2: Q&A PRACTICE ============ -->
     <section id="tab-part2" class="tab">
       <div class="card">
-        <h2>Part 2 · Listen and answer 听后回答</h2>
+        <h2>Part 2 · Listen and answer 听后回答 tīng hòu huídá</h2>
         <p>In the exam the teacher reads a question <strong>once</strong> and you answer. Practice here: first try with characters only (that simulates listening — no help!), say your answer out loud, then reveal the sample answer to check. Click any word you don't know.</p>
         <div class="controls">
           <select id="listen-topic"></select>
@@ -96,13 +96,13 @@
         <div class="listen-box">
           <div class="listen-counter" id="listen-counter"></div>
           <div class="qa-block">
-            <div class="qa-label">Question 问题</div>
+            <div class="qa-label">Question 问题 wèntí</div>
             <div class="zh big-zh hide-py" id="listen-q-zh"></div>
             <button id="listen-q-help" class="btn ghost small">🔤 I'm stuck — show pinyin</button>
           </div>
           <div id="listen-reveal" class="hidden">
             <div class="qa-block answer">
-              <div class="qa-label">Sample answer 回答</div>
+              <div class="qa-label">Sample answer 回答 huídá</div>
               <div class="zh big-zh" id="listen-a-zh"></div>
             </div>
           </div>
@@ -117,18 +117,18 @@
     <!-- ============ PART 3: MAKE QUESTIONS ============ -->
     <section id="tab-part3" class="tab">
       <div class="card">
-        <h2>Part 3 · Make a question 根据答案提问</h2>
+        <h2>Part 3 · Make a question 根据答案提问 gēnjù dá'àn tíwèn</h2>
         <p>You see the <strong>answer</strong> — your job is to say the <strong>question</strong> that produces it. Use the hint if stuck, then reveal. Click any word for its meaning.</p>
         <div class="listen-box">
           <div class="listen-counter" id="p3-counter"></div>
           <div class="qa-block statement">
-            <div class="qa-label">Answer (given) 答案</div>
+            <div class="qa-label">Answer (given) 答案 dá'àn</div>
             <div class="zh big-zh" id="p3-s-zh"></div>
           </div>
           <div id="p3-hint" class="hint hidden"></div>
           <div id="p3-reveal" class="hidden">
             <div class="qa-block answer">
-              <div class="qa-label">Your question should be 问题</div>
+              <div class="qa-label">Your question should be 问题 wèntí</div>
               <div id="p3-questions"></div>
             </div>
           </div>
@@ -151,7 +151,7 @@
     <!-- ============ PART 4: MONOLOGUES ============ -->
     <section id="tab-part4" class="tab">
       <div class="card">
-        <h2>Part 4 · Speaking topics 介绍……</h2>
+        <h2>Part 4 · Speaking topics 介绍 jièshào……</h2>
         <p>One of these four topics will be on the exam (the sample paper had <strong>the wallet</strong>). Learn the model text — click any word you don't understand — then use <strong>🎤 Recite mode</strong> to test your memory: the Chinese is hidden and you reveal it line by line after saying it out loud.</p>
         <div class="controls" id="mono-tabs"></div>
         <div class="controls">
