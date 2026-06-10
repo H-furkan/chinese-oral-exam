@@ -186,18 +186,14 @@ function renderListen() {
   $("#listen-counter").textContent = d ? `Question ${listenState.idx + 1} of ${listenState.order.length} · topic: ${d.topic}` : "";
   $("#listen-reveal").classList.add("hidden");
   $("#listen-q-zh").classList.add("hide-py");
-  $("#listen-q-en").classList.add("hidden");
   $("#listen-q-help").classList.remove("hidden");
   if (!d) return;
   $("#listen-q-zh").innerHTML = seg(d.q.zh);
-  $("#listen-q-en").textContent = d.q.en;
   $("#listen-a-zh").innerHTML = seg(d.a.zh);
-  $("#listen-a-en").textContent = d.a.en;
 }
 
 function listenHelp() {
   $("#listen-q-zh").classList.remove("hide-py");
-  $("#listen-q-en").classList.remove("hidden");
   $("#listen-q-help").classList.add("hidden");
 }
 $("#listen-q-help").addEventListener("click", listenHelp);
@@ -225,12 +221,11 @@ function renderP3() {
   if (!item) return;
   $("#p3-counter").textContent = `Statement ${p3State.idx + 1} of ${p3State.order.length}`;
   $("#p3-s-zh").innerHTML = seg(item.s.zh);
-  $("#p3-s-en").textContent = item.s.en;
   $("#p3-hint").textContent = "💡 " + item.hint;
   $("#p3-hint").classList.add("hidden");
   $("#p3-reveal").classList.add("hidden");
   $("#p3-questions").innerHTML = item.q.map(q =>
-    `<div class="zh big-zh">${seg(q.zh)}</div><p class="en">${q.en}</p><hr style="border:none;margin:0.5rem">`
+    `<div class="zh big-zh">${seg(q.zh)}</div><hr style="border:none;margin:0.5rem">`
   ).join("");
 }
 

@@ -29,7 +29,7 @@
         <h2>欢迎！Welcome to your exam trainer</h2>
         <p>This site covers <strong>everything on the final oral exam</strong>, built from your course materials (sample paper, lessons 6–10 Q&amp;A, and the four speaking topics).</p>
         <div class="tip-box">
-          <strong>👆 New:</strong> in every Chinese sentence you can <strong>click any word — the characters or the pinyin —</strong> and a bar will pop up explaining that word (pinyin + meaning). Use it whenever a sentence doesn't make sense word by word!
+          <strong>👆 How it works:</strong> sentences are shown <strong>without English</strong> on purpose — that's how the exam feels. When a word blocks you, <strong>click it (the characters or the pinyin)</strong> and a bar pops up with its meaning. Full-sentence English stays available behind the "Show English" toggles if you really need it.
         </div>
         <div class="exam-structure">
           <div class="part-card" data-goto="part1">
@@ -98,14 +98,12 @@
           <div class="qa-block">
             <div class="qa-label">Question 问题</div>
             <div class="zh big-zh hide-py" id="listen-q-zh"></div>
-            <p class="en hidden" id="listen-q-en"></p>
-            <button id="listen-q-help" class="btn ghost small">🔤 I'm stuck — show pinyin &amp; English</button>
+            <button id="listen-q-help" class="btn ghost small">🔤 I'm stuck — show pinyin</button>
           </div>
           <div id="listen-reveal" class="hidden">
             <div class="qa-block answer">
               <div class="qa-label">Sample answer 回答</div>
               <div class="zh big-zh" id="listen-a-zh"></div>
-              <p class="en" id="listen-a-en"></p>
             </div>
           </div>
           <div class="fc-actions">
@@ -126,7 +124,6 @@
           <div class="qa-block statement">
             <div class="qa-label">Answer (given) 答案</div>
             <div class="zh big-zh" id="p3-s-zh"></div>
-            <p class="en" id="p3-s-en"></p>
           </div>
           <div id="p3-hint" class="hint hidden"></div>
           <div id="p3-reveal" class="hidden">
@@ -159,7 +156,7 @@
         <div class="controls" id="mono-tabs"></div>
         <div class="controls">
           <label class="check"><input type="checkbox" id="mono-py" checked> Show pinyin</label>
-          <label class="check"><input type="checkbox" id="mono-en" checked> Show English</label>
+          <label class="check"><input type="checkbox" id="mono-en"> Show English</label>
           <label class="check"><input type="checkbox" id="mono-recite"> 🎤 Recite mode (hide Chinese)</label>
         </div>
         <div id="mono-tip" class="tip-box"></div>
@@ -175,7 +172,7 @@
         <div class="controls">
           <select id="dlg-topic"></select>
           <label class="check"><input type="checkbox" id="dlg-py" checked> Pinyin</label>
-          <label class="check"><input type="checkbox" id="dlg-en" checked> English</label>
+          <label class="check"><input type="checkbox" id="dlg-en"> English</label>
           <label class="check"><input type="checkbox" id="dlg-hide"> 🙈 Hide answers</label>
         </div>
         <div id="dlg-list"></div>
