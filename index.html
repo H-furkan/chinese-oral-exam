@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中文口语考试 · Chinese Oral Exam Trainer</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🀄</text></svg>">
+</head>
+<body>
+  <header>
+    <h1>🀄 Chinese Oral Exam Trainer</h1>
+    <p class="subtitle">Lessons 6–10 · Final Oral Exam · <span id="countdown"></span></p>
+    <nav id="tabs">
+      <button data-tab="home" class="active">🏠 Home</button>
+      <button data-tab="part1">1️⃣ Vocabulary</button>
+      <button data-tab="part2">2️⃣ Listening</button>
+      <button data-tab="part3">3️⃣ Make Questions</button>
+      <button data-tab="part4">4️⃣ Monologues</button>
+      <button data-tab="dialogues">💬 Dialogues</button>
+      <button data-tab="quiz">🎯 Quiz</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ HOME ============ -->
+    <section id="tab-home" class="tab active">
+      <div class="card hero">
+        <h2>欢迎！Welcome to your exam trainer</h2>
+        <p>This site covers <strong>everything on the final oral exam</strong>, built from your course materials (sample paper, lessons 6–10 Q&amp;A, and the four speaking topics).</p>
+        <div class="exam-structure">
+          <div class="part-card" data-goto="part1">
+            <h3>Part 1 · 第一部分</h3>
+            <p class="zh-sample">根据英文意思说出中文</p>
+            <p>Say the Chinese for an English word or sentence. <em>Practice with flashcards →</em></p>
+          </div>
+          <div class="part-card" data-goto="part2">
+            <h3>Part 2 · 第二部分</h3>
+            <p class="zh-sample">听后回答</p>
+            <p>The teacher reads a question once — you answer. <em>Practice with audio →</em></p>
+          </div>
+          <div class="part-card" data-goto="part3">
+            <h3>Part 3 · 第三部分</h3>
+            <p class="zh-sample">根据答案提问</p>
+            <p>You see an answer — you must ask the question. <em>Practice question words →</em></p>
+          </div>
+          <div class="part-card" data-goto="part4">
+            <h3>Part 4 · 第四部分</h3>
+            <p class="zh-sample">介绍…… (周计划 / 朋友 / 钱包 / 房间)</p>
+            <p>Give a short talk on one of the four topics. <em>Learn the model answers →</em></p>
+          </div>
+        </div>
+        <div class="tip-box">
+          <strong>📅 Exam date:</strong> 中文考试是6月16号。(The Chinese exam is June 16th.)<br>
+          <strong>💡 Study plan:</strong> ① learn vocabulary → ② drill the 39 dialogues → ③ practice making questions → ④ memorize your four monologues → ⑤ test yourself with the quiz.
+        </div>
+        <div id="progress-summary"></div>
+      </div>
+    </section>
+
+    <!-- ============ PART 1: VOCAB FLASHCARDS ============ -->
+    <section id="tab-part1" class="tab">
+      <div class="card">
+        <h2>Part 1 · Speak Chinese according to English</h2>
+        <p>You'll hear an English word — say it in Chinese. Click the card to flip. Grade yourself honestly: ✅ moves it to "known", ❌ keeps it in rotation.</p>
+        <div class="controls">
+          <select id="vocab-cat"></select>
+          <button id="vocab-shuffle" class="btn">🔀 Shuffle</button>
+          <button id="vocab-reset" class="btn ghost">↺ Reset progress</button>
+          <span id="vocab-stats" class="stats"></span>
+        </div>
+        <div id="flashcard" class="flashcard">
+          <div class="fc-inner">
+            <div class="fc-front"></div>
+            <div class="fc-back"></div>
+          </div>
+        </div>
+        <div class="fc-actions">
+          <button id="fc-wrong" class="btn danger">❌ Didn't know</button>
+          <button id="fc-speak" class="btn ghost">🔊 Hear it</button>
+          <button id="fc-right" class="btn success">✅ Knew it</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PART 2: LISTENING ============ -->
+    <section id="tab-part2" class="tab">
+      <div class="card">
+        <h2>Part 2 · Listen and answer 听后回答</h2>
+        <p>Just like the exam: press play, listen to the question <strong>(it plays once — like the real exam!)</strong>, answer out loud, then reveal to check yourself.</p>
+        <div class="controls">
+          <select id="listen-topic"></select>
+          <label class="check"><input type="checkbox" id="listen-slow"> 🐢 Slow speed</label>
+        </div>
+        <div class="listen-box">
+          <div class="listen-counter" id="listen-counter"></div>
+          <button id="listen-play" class="btn big">▶️ Play question</button>
+          <button id="listen-replay" class="btn ghost">🔁 Replay</button>
+          <div id="listen-reveal" class="hidden">
+            <div class="qa-block">
+              <div class="qa-label">Question 问题</div>
+              <p class="zh big-zh" id="listen-q-zh"></p>
+              <p class="py" id="listen-q-py"></p>
+              <p class="en" id="listen-q-en"></p>
+            </div>
+            <div class="qa-block answer">
+              <div class="qa-label">Sample answer 回答</div>
+              <p class="zh big-zh" id="listen-a-zh"></p>
+              <p class="py" id="listen-a-py"></p>
+              <p class="en" id="listen-a-en"></p>
+              <button id="listen-a-speak" class="btn ghost small">🔊 Hear answer</button>
+            </div>
+          </div>
+          <div class="fc-actions">
+            <button id="listen-show" class="btn">👀 Reveal question &amp; answer</button>
+            <button id="listen-next" class="btn success">Next ➡️</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PART 3: MAKE QUESTIONS ============ -->
+    <section id="tab-part3" class="tab">
+      <div class="card">
+        <h2>Part 3 · Make a question 根据答案提问</h2>
+        <p>You see the <strong>answer</strong> — your job is to say the <strong>question</strong> that produces it. Use the hint if stuck, then reveal.</p>
+        <div class="listen-box">
+          <div class="listen-counter" id="p3-counter"></div>
+          <div class="qa-block statement">
+            <div class="qa-label">Answer (given) 答案</div>
+            <p class="zh big-zh" id="p3-s-zh"></p>
+            <p class="py toggleable" id="p3-s-py"></p>
+            <p class="en" id="p3-s-en"></p>
+            <button id="p3-s-speak" class="btn ghost small">🔊 Hear it</button>
+          </div>
+          <div id="p3-hint" class="hint hidden"></div>
+          <div id="p3-reveal" class="hidden">
+            <div class="qa-block answer">
+              <div class="qa-label">Your question should be 问题</div>
+              <div id="p3-questions"></div>
+            </div>
+          </div>
+          <div class="fc-actions">
+            <button id="p3-hint-btn" class="btn ghost">💡 Hint</button>
+            <button id="p3-show" class="btn">👀 Reveal question</button>
+            <button id="p3-next" class="btn success">Next ➡️</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>📖 Question-word cheat sheet</h2>
+        <table id="qw-table">
+          <thead><tr><th>Question word</th><th>Pinyin</th><th>Used for</th><th>Example</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ PART 4: MONOLOGUES ============ -->
+    <section id="tab-part4" class="tab">
+      <div class="card">
+        <h2>Part 4 · Speaking topics 介绍……</h2>
+        <p>One of these four topics will be on the exam (the sample paper had <strong>the wallet</strong>). Learn the model, listen line by line, then use <strong>🎤 Recite mode</strong> to test your memory: the Chinese is hidden and you reveal line by line.</p>
+        <div class="controls" id="mono-tabs"></div>
+        <div class="controls">
+          <label class="check"><input type="checkbox" id="mono-py" checked> Show pinyin</label>
+          <label class="check"><input type="checkbox" id="mono-en" checked> Show English</label>
+          <label class="check"><input type="checkbox" id="mono-recite"> 🎤 Recite mode (hide Chinese)</label>
+          <button id="mono-speak-all" class="btn">🔊 Play whole text</button>
+        </div>
+        <div id="mono-tip" class="tip-box"></div>
+        <div id="mono-lines"></div>
+      </div>
+    </section>
+
+    <!-- ============ DIALOGUES ============ -->
+    <section id="tab-dialogues" class="tab">
+      <div class="card">
+        <h2>💬 All 39 practice dialogues (lessons 6–10)</h2>
+        <p>Every Q&amp;A from your course. Filter by topic, hide answers to test yourself, click 🔊 to hear native-style pronunciation.</p>
+        <div class="controls">
+          <select id="dlg-topic"></select>
+          <label class="check"><input type="checkbox" id="dlg-py" checked> Pinyin</label>
+          <label class="check"><input type="checkbox" id="dlg-en" checked> English</label>
+          <label class="check"><input type="checkbox" id="dlg-hide"> 🙈 Hide answers</label>
+        </div>
+        <div id="dlg-list"></div>
+      </div>
+    </section>
+
+    <!-- ============ QUIZ ============ -->
+    <section id="tab-quiz" class="tab">
+      <div class="card">
+        <h2>🎯 Mixed quiz — test yourself!</h2>
+        <p>10 random multiple-choice questions covering every part of the exam. Can you get 10/10?</p>
+        <div id="quiz-area">
+          <button id="quiz-start" class="btn big">🚀 Start quiz</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>加油！(Jiāyóu! — You can do it!) · Built from lessons 6–10 course material · TTS works best in Chrome/Edge</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
