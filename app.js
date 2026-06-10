@@ -11,33 +11,6 @@ function shuffle(arr) {
   return a;
 }
 
-/* Text-to-speech: prefer a zh-CN voice */
-let zhVoice = null;
-function pickVoice() {
-  const voices = speechSynthesis.getVoices();
-  zhVoice =
-    voices.find(v => v.lang === "zh-CN") ||
-    voices.find(v => v.lang.startsWith("zh")) ||
-    null;
-}
-if ("speechSynthesis" in window) {
-  pickVoice();
-  speechSynthesis.onvoiceschanged = pickVoice;
-}
-function speak(text, slow = false) {
-  if (!("speechSynthesis" in window)) {
-    alert("Your browser does not support speech. Try Chrome or Edge.");
-    return;
-  }
-  speechSynthesis.cancel();
-  const clean = text.replace(/[“”]/g, "").replace(/BIG CHEFS|Starbucks|water/g, m => m);
-  const u = new SpeechSynthesisUtterance(clean);
-  u.lang = "zh-CN";
-  if (zhVoice) u.voice = zhVoice;
-  u.rate = slow ? 0.6 : 0.85;
-  speechSynthesis.speak(u);
-}
-
 /* localStorage progress */
 const store = {
   get(key, fallback) {
@@ -47,11 +20,58 @@ const store = {
   set(key, val) { localStorage.setItem("chnexam_" + key, JSON.stringify(val)); },
 };
 
+/* ============ word segmentation + click-to-explain ============ */
+const GLOSS_MAX = Math.max(...Object.keys(DATA.glossary).map(w => w.length));
+
+function matchAt(zh, i) {
+  for (let L = Math.min(GLOSS_MAX, zh.length - i); L >= 1; L--) {
+    if (DATA.glossary[zh.slice(i, i + L)]) return zh.slice(i, i + L);
+  }
+  return null;
+}
+
+/* Turn a Chinese sentence into clickable word units (pinyin above hanzi).
+   Clicking a word — its characters OR its pinyin — opens the word bar. */
+function seg(zh) {
+  let out = "", i = 0;
+  while (i < zh.length) {
+    const m = matchAt(zh, i);
+    if (m) {
+      const [py] = DATA.glossary[m];
+      out += `<span class="w" data-w="${m}"><span class="w-py">${py}</span><span class="w-zh">${m}</span></span>`;
+      i += m.length;
+    } else {
+      // group consecutive unmatched chars (numbers, punctuation, latin)
+      let j = i + 1;
+      while (j < zh.length && !matchAt(zh, j)) j++;
+      out += `<span class="w plain"><span class="w-py">&nbsp;</span><span class="w-zh">${zh.slice(i, j)}</span></span>`;
+      i = j;
+    }
+  }
+  return `<span class="seg">${out}</span>`;
+}
+
+document.addEventListener("click", (e) => {
+  const w = e.target.closest(".w");
+  if (!w || w.classList.contains("plain") || w.closest(".veiled")) return;
+  const entry = DATA.glossary[w.dataset.w];
+  if (!entry) return;
+  $$(".w.sel").forEach(x => x.classList.remove("sel"));
+  w.classList.add("sel");
+  $("#wb-zh").textContent = w.dataset.w;
+  $("#wb-py").textContent = entry[0];
+  $("#wb-en").textContent = "— " + entry[1];
+  $("#wordbar").classList.remove("hidden");
+});
+$("#wb-close").addEventListener("click", () => {
+  $("#wordbar").classList.add("hidden");
+  $$(".w.sel").forEach(x => x.classList.remove("sel"));
+});
+
 /* ============ tabs ============ */
 function showTab(name) {
   $$("nav#tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
   $$(".tab").forEach(t => t.classList.toggle("active", t.id === "tab-" + name));
-  window.speechSynthesis?.cancel();
   window.scrollTo({ top: 0 });
 }
 $$("nav#tabs button").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
@@ -127,17 +147,9 @@ function nextCard(markKnown) {
   renderProgressSummary();
 }
 
-$("#flashcard").addEventListener("click", () => {
-  $("#flashcard").classList.toggle("flipped");
-  const v = vocabState.deck[vocabState.idx];
-  if (v && $("#flashcard").classList.contains("flipped")) speak(v.zh);
-});
+$("#flashcard").addEventListener("click", () => $("#flashcard").classList.toggle("flipped"));
 $("#fc-right").addEventListener("click", () => nextCard(true));
 $("#fc-wrong").addEventListener("click", () => nextCard(false));
-$("#fc-speak").addEventListener("click", () => {
-  const v = vocabState.deck[vocabState.idx];
-  if (v) speak(v.zh);
-});
 $("#vocab-cat").addEventListener("change", rebuildDeck);
 $("#vocab-shuffle").addEventListener("click", rebuildDeck);
 $("#vocab-reset").addEventListener("click", () => {
@@ -149,8 +161,8 @@ $("#vocab-reset").addEventListener("click", () => {
   }
 });
 
-/* ============ PART 2: listening ============ */
-const listenState = { order: [], idx: 0, revealed: false };
+/* ============ PART 2: Q&A practice ============ */
+const listenState = { order: [], idx: 0 };
 
 function buildListenTopics() {
   const topics = ["All topics", ...new Set(DATA.dialogues.map(d => d.topic))];
@@ -164,7 +176,6 @@ function rebuildListen() {
     .filter(d => t === "All topics" || d.topic === t);
   listenState.order = shuffle(pool);
   listenState.idx = 0;
-  listenState.revealed = false;
   renderListen();
 }
 
@@ -174,30 +185,25 @@ function renderListen() {
   const d = currentListen();
   $("#listen-counter").textContent = d ? `Question ${listenState.idx + 1} of ${listenState.order.length} · topic: ${d.topic}` : "";
   $("#listen-reveal").classList.add("hidden");
-  listenState.revealed = false;
+  $("#listen-q-zh").classList.add("hide-py");
+  $("#listen-q-en").classList.add("hidden");
+  $("#listen-q-help").classList.remove("hidden");
   if (!d) return;
-  $("#listen-q-zh").textContent = d.q.zh;
-  $("#listen-q-py").textContent = d.q.py;
+  $("#listen-q-zh").innerHTML = seg(d.q.zh);
   $("#listen-q-en").textContent = d.q.en;
-  $("#listen-a-zh").textContent = d.a.zh;
-  $("#listen-a-py").textContent = d.a.py;
+  $("#listen-a-zh").innerHTML = seg(d.a.zh);
   $("#listen-a-en").textContent = d.a.en;
 }
 
-$("#listen-play").addEventListener("click", () => {
-  const d = currentListen();
-  if (d) speak(d.q.zh, $("#listen-slow").checked);
-});
-$("#listen-replay").addEventListener("click", () => {
-  const d = currentListen();
-  if (d) speak(d.q.zh, $("#listen-slow").checked);
-});
+function listenHelp() {
+  $("#listen-q-zh").classList.remove("hide-py");
+  $("#listen-q-en").classList.remove("hidden");
+  $("#listen-q-help").classList.add("hidden");
+}
+$("#listen-q-help").addEventListener("click", listenHelp);
 $("#listen-show").addEventListener("click", () => {
   $("#listen-reveal").classList.remove("hidden");
-});
-$("#listen-a-speak").addEventListener("click", () => {
-  const d = currentListen();
-  if (d) speak(d.a.zh, $("#listen-slow").checked);
+  listenHelp(); // once the answer is out, question help is free
 });
 $("#listen-next").addEventListener("click", () => {
   listenState.idx = (listenState.idx + 1) % Math.max(listenState.order.length, 1);
@@ -218,23 +224,16 @@ function renderP3() {
   const item = p3State.order[p3State.idx];
   if (!item) return;
   $("#p3-counter").textContent = `Statement ${p3State.idx + 1} of ${p3State.order.length}`;
-  $("#p3-s-zh").textContent = item.s.zh;
-  $("#p3-s-py").textContent = item.s.py;
+  $("#p3-s-zh").innerHTML = seg(item.s.zh);
   $("#p3-s-en").textContent = item.s.en;
   $("#p3-hint").textContent = "💡 " + item.hint;
   $("#p3-hint").classList.add("hidden");
   $("#p3-reveal").classList.add("hidden");
   $("#p3-questions").innerHTML = item.q.map(q =>
-    `<p class="zh big-zh">${q.zh}</p><p class="py">${q.py}</p><p class="en">${q.en}</p>
-     <button class="btn ghost small p3-q-speak" data-text="${q.zh}">🔊 Hear it</button><hr style="border:none;margin:0.5rem">`
+    `<div class="zh big-zh">${seg(q.zh)}</div><p class="en">${q.en}</p><hr style="border:none;margin:0.5rem">`
   ).join("");
-  $$(".p3-q-speak").forEach(b => b.addEventListener("click", () => speak(b.dataset.text)));
 }
 
-$("#p3-s-speak").addEventListener("click", () => {
-  const item = p3State.order[p3State.idx];
-  if (item) speak(item.s.zh);
-});
 $("#p3-hint-btn").addEventListener("click", () => $("#p3-hint").classList.toggle("hidden"));
 $("#p3-show").addEventListener("click", () => $("#p3-reveal").classList.remove("hidden"));
 $("#p3-next").addEventListener("click", () => {
@@ -244,7 +243,7 @@ $("#p3-next").addEventListener("click", () => {
 
 function buildQwTable() {
   $("#qw-table tbody").innerHTML = DATA.questionWords.map(q =>
-    `<tr><td>${q.qw}</td><td>${q.py}</td><td>${q.use}</td><td class="zh-ex">${q.ex}</td></tr>`
+    `<tr><td>${q.qw}</td><td>${q.py}</td><td>${q.use}</td><td class="zh-ex hide-py">${seg(q.ex)}</td></tr>`
   ).join("");
 }
 
@@ -270,25 +269,18 @@ function renderMono() {
   const recite = $("#mono-recite").checked;
   $("#mono-lines").innerHTML = m.lines.map((l, i) => `
     <div class="mono-line">
-      <button class="speak-btn" data-i="${i}" title="Listen">🔊</button>
+      <span class="line-num">${i + 1}.</span>
       <div class="line-text">
-        <div class="zh ${recite ? "veiled" : ""}" data-i="${i}">${l.zh}</div>
-        ${showPy ? `<div class="py">${l.py}</div>` : ""}
+        <div class="zh ${showPy ? "" : "hide-py"} ${recite ? "veiled" : ""}" data-i="${i}">${seg(l.zh)}</div>
         ${showEn ? `<div class="en">${l.en}</div>` : ""}
       </div>
     </div>`).join("");
-  $$("#mono-lines .speak-btn").forEach(b =>
-    b.addEventListener("click", () => speak(m.lines[+b.dataset.i].zh)));
   $$("#mono-lines .zh").forEach(z =>
     z.addEventListener("click", () => z.classList.remove("veiled")));
 }
 
 ["mono-py", "mono-en", "mono-recite"].forEach(id =>
   $("#" + id).addEventListener("change", renderMono));
-$("#mono-speak-all").addEventListener("click", () => {
-  const m = DATA.monologues[monoState.idx];
-  speak(m.lines.map(l => l.zh).join(""));
-});
 
 /* ============ dialogues browser ============ */
 function buildDlgTopics() {
@@ -301,6 +293,7 @@ function renderDialogues() {
   const showPy = $("#dlg-py").checked;
   const showEn = $("#dlg-en").checked;
   const hide = $("#dlg-hide").checked;
+  const pyCls = showPy ? "" : "hide-py";
   const list = DATA.dialogues
     .map((d, i) => ({ ...d, n: i + 1 }))
     .filter(d => t === "All topics" || d.topic === t);
@@ -310,24 +303,18 @@ function renderDialogues() {
       <div class="dlg-row a">
         <span class="who">A:</span>
         <div class="line-text">
-          <div class="zh">${d.q.zh}</div>
-          ${showPy ? `<div class="py">${d.q.py}</div>` : ""}
+          <div class="zh ${pyCls}">${seg(d.q.zh)}</div>
           ${showEn ? `<div class="en">${d.q.en}</div>` : ""}
         </div>
-        <button class="speak-btn" data-text="${d.q.zh.replace(/"/g, "&quot;")}">🔊</button>
       </div>
       <div class="dlg-row b ${hide ? "veiled" : ""}">
         <span class="who">B:</span>
         <div class="line-text">
-          <div class="zh">${d.a.zh}</div>
-          ${showPy ? `<div class="py">${d.a.py}</div>` : ""}
+          <div class="zh ${pyCls}">${seg(d.a.zh)}</div>
           ${showEn ? `<div class="en">${d.a.en}</div>` : ""}
         </div>
-        <button class="speak-btn" data-text="${d.a.zh.replace(/"/g, "&quot;")}">🔊</button>
       </div>
     </div>`).join("");
-  $$("#dlg-list .speak-btn").forEach(b =>
-    b.addEventListener("click", () => speak(b.dataset.text)));
   $$("#dlg-list .dlg-row.b.veiled .line-text").forEach(el =>
     el.addEventListener("click", () => el.parentElement.classList.remove("veiled")));
 }
@@ -350,7 +337,6 @@ function makeQuiz() {
       zh: null,
       options: shuffle([v, ...wrong]).map(o => ({ label: `${o.zh}（${o.py}）`, ok: o.zh === v.zh })),
       explain: `${v.zh} (${v.py}) = ${v.en}`,
-      say: v.zh,
     });
   });
   // type 2: pick the right answer to a question (from dialogues)
@@ -364,7 +350,6 @@ function makeQuiz() {
       zh: d.q.zh,
       options: shuffle([d, ...wrong]).map(o => ({ label: o.a.zh, ok: o.a.zh === d.a.zh })),
       explain: `${d.q.zh} (${d.q.en}) → ${d.a.zh} (${d.a.en})`,
-      say: d.q.zh,
     });
   });
   // type 3: pick the right question for an answer (Part 3 style)
@@ -375,7 +360,6 @@ function makeQuiz() {
       zh: p.s.zh,
       options: shuffle([p, ...wrong]).map(o => ({ label: o.q[0].zh, ok: o.q[0].zh === p.q[0].zh })),
       explain: `${p.s.zh} ← ${p.q[0].zh} (${p.q[0].en})`,
-      say: p.s.zh,
     });
   });
   return shuffle(qs).slice(0, QUIZ_LEN);
@@ -393,7 +377,7 @@ function renderQuizQ() {
     <div class="quiz-progress">Question ${quiz.idx + 1} / ${quiz.qs.length} · Score: ${quiz.score}</div>
     <div class="quiz-q">
       <p>${q.prompt}</p>
-      ${q.zh ? `<p class="zh">${q.zh} <button class="speak-btn" id="quiz-say">🔊</button></p>` : ""}
+      ${q.zh ? `<div class="zh">${seg(q.zh)}</div>` : ""}
     </div>
     <div class="quiz-opts">
       ${q.options.map((o, i) => `<button data-i="${i}">${o.label}</button>`).join("")}
@@ -402,9 +386,8 @@ function renderQuizQ() {
     <div class="fc-actions" style="margin-top:0.8rem">
       <button id="quiz-next" class="btn success hidden">Next ➡️</button>
     </div>`;
-  $("#quiz-say")?.addEventListener("click", () => speak(q.say));
   $$(".quiz-opts button").forEach(b => b.addEventListener("click", () => {
-    if ($("#quiz-next").classList.contains("hidden") === false) return; // already answered
+    if (!$("#quiz-next").classList.contains("hidden")) return; // already answered
     const o = q.options[+b.dataset.i];
     if (o.ok) { b.classList.add("correct"); quiz.score++; }
     else {

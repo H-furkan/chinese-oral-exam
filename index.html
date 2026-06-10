@@ -14,7 +14,7 @@
     <nav id="tabs">
       <button data-tab="home" class="active">🏠 Home</button>
       <button data-tab="part1">1️⃣ Vocabulary</button>
-      <button data-tab="part2">2️⃣ Listening</button>
+      <button data-tab="part2">2️⃣ Q&amp;A Practice</button>
       <button data-tab="part3">3️⃣ Make Questions</button>
       <button data-tab="part4">4️⃣ Monologues</button>
       <button data-tab="dialogues">💬 Dialogues</button>
@@ -28,6 +28,9 @@
       <div class="card hero">
         <h2>欢迎！Welcome to your exam trainer</h2>
         <p>This site covers <strong>everything on the final oral exam</strong>, built from your course materials (sample paper, lessons 6–10 Q&amp;A, and the four speaking topics).</p>
+        <div class="tip-box">
+          <strong>👆 New:</strong> in every Chinese sentence you can <strong>click any word — the characters or the pinyin —</strong> and a bar will pop up explaining that word (pinyin + meaning). Use it whenever a sentence doesn't make sense word by word!
+        </div>
         <div class="exam-structure">
           <div class="part-card" data-goto="part1">
             <h3>Part 1 · 第一部分</h3>
@@ -37,7 +40,7 @@
           <div class="part-card" data-goto="part2">
             <h3>Part 2 · 第二部分</h3>
             <p class="zh-sample">听后回答</p>
-            <p>The teacher reads a question once — you answer. <em>Practice with audio →</em></p>
+            <p>The teacher reads a question once — you answer. <em>Practice the questions →</em></p>
           </div>
           <div class="part-card" data-goto="part3">
             <h3>Part 3 · 第三部分</h3>
@@ -62,7 +65,7 @@
     <section id="tab-part1" class="tab">
       <div class="card">
         <h2>Part 1 · Speak Chinese according to English</h2>
-        <p>You'll hear an English word — say it in Chinese. Click the card to flip. Grade yourself honestly: ✅ moves it to "known", ❌ keeps it in rotation.</p>
+        <p>You'll hear an English word — say it in Chinese. Click the card to flip and check yourself. Grade yourself honestly: ✅ moves it to "known", ❌ keeps it in rotation.</p>
         <div class="controls">
           <select id="vocab-cat"></select>
           <button id="vocab-shuffle" class="btn">🔀 Shuffle</button>
@@ -77,42 +80,36 @@
         </div>
         <div class="fc-actions">
           <button id="fc-wrong" class="btn danger">❌ Didn't know</button>
-          <button id="fc-speak" class="btn ghost">🔊 Hear it</button>
           <button id="fc-right" class="btn success">✅ Knew it</button>
         </div>
       </div>
     </section>
 
-    <!-- ============ PART 2: LISTENING ============ -->
+    <!-- ============ PART 2: Q&A PRACTICE ============ -->
     <section id="tab-part2" class="tab">
       <div class="card">
         <h2>Part 2 · Listen and answer 听后回答</h2>
-        <p>Just like the exam: press play, listen to the question <strong>(it plays once — like the real exam!)</strong>, answer out loud, then reveal to check yourself.</p>
+        <p>In the exam the teacher reads a question <strong>once</strong> and you answer. Practice here: first try with characters only (that simulates listening — no help!), say your answer out loud, then reveal the sample answer to check. Click any word you don't know.</p>
         <div class="controls">
           <select id="listen-topic"></select>
-          <label class="check"><input type="checkbox" id="listen-slow"> 🐢 Slow speed</label>
         </div>
         <div class="listen-box">
           <div class="listen-counter" id="listen-counter"></div>
-          <button id="listen-play" class="btn big">▶️ Play question</button>
-          <button id="listen-replay" class="btn ghost">🔁 Replay</button>
+          <div class="qa-block">
+            <div class="qa-label">Question 问题</div>
+            <div class="zh big-zh hide-py" id="listen-q-zh"></div>
+            <p class="en hidden" id="listen-q-en"></p>
+            <button id="listen-q-help" class="btn ghost small">🔤 I'm stuck — show pinyin &amp; English</button>
+          </div>
           <div id="listen-reveal" class="hidden">
-            <div class="qa-block">
-              <div class="qa-label">Question 问题</div>
-              <p class="zh big-zh" id="listen-q-zh"></p>
-              <p class="py" id="listen-q-py"></p>
-              <p class="en" id="listen-q-en"></p>
-            </div>
             <div class="qa-block answer">
               <div class="qa-label">Sample answer 回答</div>
-              <p class="zh big-zh" id="listen-a-zh"></p>
-              <p class="py" id="listen-a-py"></p>
+              <div class="zh big-zh" id="listen-a-zh"></div>
               <p class="en" id="listen-a-en"></p>
-              <button id="listen-a-speak" class="btn ghost small">🔊 Hear answer</button>
             </div>
           </div>
           <div class="fc-actions">
-            <button id="listen-show" class="btn">👀 Reveal question &amp; answer</button>
+            <button id="listen-show" class="btn">👀 Reveal sample answer</button>
             <button id="listen-next" class="btn success">Next ➡️</button>
           </div>
         </div>
@@ -123,15 +120,13 @@
     <section id="tab-part3" class="tab">
       <div class="card">
         <h2>Part 3 · Make a question 根据答案提问</h2>
-        <p>You see the <strong>answer</strong> — your job is to say the <strong>question</strong> that produces it. Use the hint if stuck, then reveal.</p>
+        <p>You see the <strong>answer</strong> — your job is to say the <strong>question</strong> that produces it. Use the hint if stuck, then reveal. Click any word for its meaning.</p>
         <div class="listen-box">
           <div class="listen-counter" id="p3-counter"></div>
           <div class="qa-block statement">
             <div class="qa-label">Answer (given) 答案</div>
-            <p class="zh big-zh" id="p3-s-zh"></p>
-            <p class="py toggleable" id="p3-s-py"></p>
+            <div class="zh big-zh" id="p3-s-zh"></div>
             <p class="en" id="p3-s-en"></p>
-            <button id="p3-s-speak" class="btn ghost small">🔊 Hear it</button>
           </div>
           <div id="p3-hint" class="hint hidden"></div>
           <div id="p3-reveal" class="hidden">
@@ -160,13 +155,12 @@
     <section id="tab-part4" class="tab">
       <div class="card">
         <h2>Part 4 · Speaking topics 介绍……</h2>
-        <p>One of these four topics will be on the exam (the sample paper had <strong>the wallet</strong>). Learn the model, listen line by line, then use <strong>🎤 Recite mode</strong> to test your memory: the Chinese is hidden and you reveal line by line.</p>
+        <p>One of these four topics will be on the exam (the sample paper had <strong>the wallet</strong>). Learn the model text — click any word you don't understand — then use <strong>🎤 Recite mode</strong> to test your memory: the Chinese is hidden and you reveal it line by line after saying it out loud.</p>
         <div class="controls" id="mono-tabs"></div>
         <div class="controls">
           <label class="check"><input type="checkbox" id="mono-py" checked> Show pinyin</label>
           <label class="check"><input type="checkbox" id="mono-en" checked> Show English</label>
           <label class="check"><input type="checkbox" id="mono-recite"> 🎤 Recite mode (hide Chinese)</label>
-          <button id="mono-speak-all" class="btn">🔊 Play whole text</button>
         </div>
         <div id="mono-tip" class="tip-box"></div>
         <div id="mono-lines"></div>
@@ -177,7 +171,7 @@
     <section id="tab-dialogues" class="tab">
       <div class="card">
         <h2>💬 All 39 practice dialogues (lessons 6–10)</h2>
-        <p>Every Q&amp;A from your course. Filter by topic, hide answers to test yourself, click 🔊 to hear native-style pronunciation.</p>
+        <p>Every Q&amp;A from your course. Filter by topic, hide answers to test yourself, and click any word (characters or pinyin) to see what it means.</p>
         <div class="controls">
           <select id="dlg-topic"></select>
           <label class="check"><input type="checkbox" id="dlg-py" checked> Pinyin</label>
@@ -201,8 +195,18 @@
   </main>
 
   <footer>
-    <p>加油！(Jiāyóu! — You can do it!) · Built from lessons 6–10 course material · TTS works best in Chrome/Edge</p>
+    <p>加油！(Jiāyóu! — You can do it!) · Built from lessons 6–10 course material</p>
   </footer>
+
+  <!-- word explanation bar -->
+  <div id="wordbar" class="hidden">
+    <div class="wb-content">
+      <span class="wb-zh" id="wb-zh"></span>
+      <span class="wb-py" id="wb-py"></span>
+      <span class="wb-en" id="wb-en"></span>
+    </div>
+    <button id="wb-close" title="Close">✕</button>
+  </div>
 
   <script src="data.js"></script>
   <script src="app.js"></script>

@@ -49,7 +49,63 @@ nav#tabs button {
 nav#tabs button:hover { background: rgba(255,255,255,0.25); }
 nav#tabs button.active { background: var(--bg); color: var(--red-dark); font-weight: bold; }
 
-main { max-width: 880px; margin: 0 auto; padding: 1.2rem 1rem 3rem; }
+main { max-width: 880px; margin: 0 auto; padding: 1.2rem 1rem 7rem; }
+
+/* ===== clickable word units (hanzi + pinyin) ===== */
+.w {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: bottom;
+  padding: 0 0.12rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.w.plain { cursor: default; }
+.w:not(.plain):hover { background: #fdebd0; }
+.w.sel { background: #f9e79f; }
+.w-py {
+  font-size: 0.62em;
+  line-height: 1.2;
+  color: var(--blue);
+  font-weight: normal;
+  white-space: nowrap;
+}
+.hide-py .w-py { display: none; }
+
+/* word explanation bar */
+#wordbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #2c3e50;
+  color: #fff;
+  padding: 0.8rem 2.8rem 0.8rem 1rem;
+  z-index: 100;
+  box-shadow: 0 -3px 12px rgba(0,0,0,0.25);
+  animation: slideup 0.18s;
+}
+@keyframes slideup { from { transform: translateY(100%); } to { transform: none; } }
+.wb-content {
+  display: flex;
+  gap: 0.9rem;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.wb-zh { font-size: 1.5rem; font-weight: bold; }
+.wb-py { color: var(--gold); font-size: 1.15rem; }
+.wb-en { font-size: 1rem; }
+#wb-close {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
 
 .tab { display: none; }
 .tab.active { display: block; animation: fadein 0.25s; }
@@ -232,21 +288,25 @@ td:first-child { font-weight: bold; font-size: 1.1rem; }
 .mono-line:hover { background: #faf6f0; }
 .mono-line .line-text { flex: 1; }
 .mono-line .zh { cursor: pointer; }
-.mono-line .zh.veiled {
+.zh.veiled {
   background: var(--ink);
-  color: transparent;
   border-radius: 6px;
   user-select: none;
-}
-.mono-line .zh.veiled:hover::after {
-  content: " (click to reveal)";
-}
-.speak-btn {
-  background: none;
-  border: none;
   cursor: pointer;
-  font-size: 1.1rem;
-  padding: 0.2rem;
+  min-height: 1.6em;
+}
+.zh.veiled .w { opacity: 0; pointer-events: none; }
+.zh.veiled:hover::after {
+  content: "click to reveal";
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+.line-num {
+  color: var(--muted);
+  font-size: 0.85rem;
+  min-width: 1.4rem;
+  padding-top: 0.3rem;
 }
 
 /* Dialogues */
